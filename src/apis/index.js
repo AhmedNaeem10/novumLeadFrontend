@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { API_CONSTANT } from '../constants/ApiConstants';
 
-const base_url = "http://localhost:4000/"
+// const base_url = "http://localhost:4000/"
+const base_url = "http://52.66.203.161:4000/"
 
 export const login = async (username, password) => {
     // return {username: "admin", token: "SOME_TOKEN"}
