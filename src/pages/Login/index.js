@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { login } from "../../apis";
-import image from '../../assets/images/loginImage.jpeg';
+import image from '../../assets/images/lead.jpeg';
 import logo from '../../assets/images/logo.png';
 import { useDispatch } from 'react-redux';
 import { adminLogin } from "../../store/actions";
@@ -32,8 +32,8 @@ export const Login = () => {
         setLoading(false);
         if (response) {
             setError(false);
-            dispatch(adminLogin({ username, token: response.token }));
-            navigate(ROUTE_CONSTANTS.DASHBOARD, { replace: true })
+            dispatch(adminLogin({ username, token: response.token, id: response.id, name: response.name }));
+            navigate(ROUTE_CONSTANTS.BOOKINGS, { replace: true })
 
         } else {
             setErrorMsg("Invalid credentials.")
@@ -55,7 +55,7 @@ export const Login = () => {
                         </Box>
 
                         <Box sx={{ flex: 3 }}>
-                            <Typography variant="h4" sx={{ textAlign: 'center', mb: 7, color: '#001051' }}>Admin Login</Typography>
+                            <Typography variant="h4" sx={{ textAlign: 'center', mb: 7, color: '#001051' }}>Lead Painter Login</Typography>
                             <TextField
                                 required
                                 id="email"

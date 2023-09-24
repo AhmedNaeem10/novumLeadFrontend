@@ -10,7 +10,7 @@ export const App = () => {
 
   useEffect(() => {
     if (token) {
-      navigate(ROUTE_CONSTANTS.DASHBOARD)
+      navigate(ROUTE_CONSTANTS.BOOKINGS)
     } else {
       navigate(ROUTE_CONSTANTS.LOGIN)
     }

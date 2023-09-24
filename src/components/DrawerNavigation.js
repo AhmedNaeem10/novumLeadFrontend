@@ -7,28 +7,21 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import MessageIcon from '@mui/icons-material/Message';
-import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import ImagesearchRollerIcon from '@mui/icons-material/ImagesearchRoller';
-import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
-import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 import LogoutIcon from '@mui/icons-material/Logout';
-import MenuIcon from '@mui/icons-material/Menu';
 import { useNavigate } from "react-router-dom";
-import { Button, Divider } from '@mui/material';
+import { Divider } from '@mui/material';
 import store from '../store';
 import { ROUTE_CONSTANTS } from '../constants/RouteConstants';
 import { adminLogout } from '../store/actions';
-import logo from '../assets/images/logo.png';
+import Typography from '@mui/material/Typography';
+import { useSelector } from 'react-redux';
 
 const items = [
   {
     icon: <MessageIcon />,
-    label: "Appointments",
-    route: ROUTE_CONSTANTS.DASHBOARD,
-  },
-  {
-    icon: <ManageSearchIcon />,
-    label: "Inspection Bookings",
+    label: "Bookings",
     route: ROUTE_CONSTANTS.BOOKINGS,
   },
   {
@@ -37,14 +30,9 @@ const items = [
     route: ROUTE_CONSTANTS.PROJECTS,
   },
   {
-    icon: <SupervisorAccountIcon />,
-    label: "Accounts",
-    route: ROUTE_CONSTANTS.ACCOUNTS,
-  },
-  {
-    icon: <PeopleOutlineIcon />,
-    label: "Users",
-    route: ROUTE_CONSTANTS.USERS,
+    icon: <AnalyticsIcon />,
+    label: "Analytics",
+    route: ROUTE_CONSTANTS.ANALYTICS,
   },
 ]
 
@@ -67,6 +55,8 @@ function DrawerNavigation({ open, toggleDrawer, logo }) {
     navigate(ROUTE_CONSTANTS.BASE)
   }
 
+  const { name } = useSelector(store => store)
+
   const list = () => (
     <Box
       sx={{ width: 300 }}
@@ -81,6 +71,9 @@ function DrawerNavigation({ open, toggleDrawer, logo }) {
         src={logo}
         onClick={() => { navigate(ROUTE_CONSTANTS.DASHBOARD) }}
       />
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: 10, marginBottom: 10 }}>
+        <Typography sx={{ marginLeft: 3, fontSize: 18 }}>{`Welcome `}</Typography><Typography sx={{ color: '#148CD0', fontWeight: "bold", ml: 1, fontSize: 18, }}>{`${name}`}</Typography>
+      </div>
       <List>
         {
           items.map((obj, index) => {

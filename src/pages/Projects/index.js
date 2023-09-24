@@ -20,10 +20,10 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import AddIcon from '@mui/icons-material/Add';
-import { Backdrop, Button, CircularProgress } from '@mui/material';
-import { getAppointments } from '../../apis';
+import { Backdrop, CircularProgress } from '@mui/material';
+import { getProjects } from '../../apis';
 import { handleNullStrings } from '../../helpers';
+import { useSelector } from 'react-redux';
 
 const headCells = [
     {
@@ -39,59 +39,17 @@ const headCells = [
         label: 'Booking Name',
     },
     {
-        id: 'bookingLocation',
-        numeric: true,
-        disablePadding: false,
-        label: 'Booking Location',
-    },
-    {
         id: 'venueType',
         numeric: true,
         disablePadding: false,
         label: 'Venue Type',
     },
     {
-        id: 'venueDetails',
+        id: 'stages',
         numeric: true,
         disablePadding: false,
-        label: 'Venue Details',
-    },
-    {
-        id: 'estimatedLiters',
-        numeric: true,
-        disablePadding: false,
-        label: 'Estimated Liters',
-    },
-    {
-        id: 'estimated',
-        numeric: true,
-        disablePadding: false,
-        label: 'Estimated Time',
-    },
-    {
-        id: 'startDate',
-        numeric: true,
-        disablePadding: false,
-        label: 'Start Date',
-    },
-    {
-        id: 'endDate',
-        numeric: true,
-        disablePadding: false,
-        label: 'End Date',
-    },
-    {
-        id: 'progress',
-        numeric: true,
-        disablePadding: false,
-        label: 'Progress',
-    },
-    {
-        id: 'leadPainter',
-        numeric: true,
-        disablePadding: false,
-        label: 'Lead Painter',
-    },
+        label: 'Stages',
+    }
 ];
 
 function EnhancedTableHead(props) {
@@ -218,9 +176,11 @@ export const Projects = () => {
     const [openFailed, setOpenFailed] = React.useState(false);
     const [text, setText] = React.useState("");
 
+    const { id } = useSelector(store => store)
+
     React.useEffect(() => {
         async function fetchData() {
-            setData(await getAppointments('confirmed'));
+            setData(await getProjects(id));
         }
         fetchData();
     }, [])
@@ -351,61 +311,7 @@ export const Projects = () => {
                                             padding="none"
                                             align='center'
                                         >
-                                            {handleNullStrings(row?.Venue?.location)}
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="none"
-                                            align='center'
-                                        >
                                             {handleNullStrings(row?.Venue?.venueType)}
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="none"
-                                            align='center'
-                                        >
-                                            {handleNullStrings(row?.Venue?.venueType)}
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="none"
-                                            align='center'
-                                        >
-                                            {handleNullStrings(row?.estimatedLiters)}
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="none"
-                                            align='center'
-                                        >
-                                            {handleNullStrings(row?.estimatedDays)}
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="none"
-                                            align='center'
-                                        >
-                                            {handleNullStrings(row?.startDate)}
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="none"
-                                            align='center'
-                                        >
-                                            {handleNullStrings(row?.endDate)}
                                         </TableCell>
                                         <TableCell
                                             component="th"
@@ -415,15 +321,6 @@ export const Projects = () => {
                                             align='center'
                                         >
                                             {handleNullStrings(row?.progress)}
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            scope="row"
-                                            padding="none"
-                                            align='center'
-                                        >
-                                            {handleNullStrings(row?.leadPainterId)}
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -451,6 +348,6 @@ export const Projects = () => {
             </Backdrop>
             {/* <SuccessToast open={openSuccess} handleClose={handleClose} text={text} />
             <FailedToast open={openFailed} handleClose={handleClose} text={text} /> */}
-        </Box>
+        </Box >
     );
 }

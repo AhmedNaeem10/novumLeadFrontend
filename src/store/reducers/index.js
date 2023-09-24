@@ -1,8 +1,10 @@
 import { REDUX_CONSTANS } from "../../constants/ReduxConstants"
 
 const initialState = {
+    id: null,
     username: '',
     token: null,
+    name: null,
 }
 
 export const reducer = (state = initialState, action) => {
@@ -12,16 +14,20 @@ export const reducer = (state = initialState, action) => {
             {
                 return {
                     ...state,
+                    id: action.payload.id,
                     username: action.payload.username,
                     token: action.payload.token,
+                    name: action.payload.name,
                 }
             }
         case REDUX_CONSTANS.LOGOUT:
             {
                 return {
                     ...state,
+                    id: null,
                     username: '',
                     token: null,
+                    name: null,
                 }
             }
         default: {

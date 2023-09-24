@@ -20,13 +20,9 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import AddIcon from '@mui/icons-material/Add';
-import { Backdrop, Button, CircularProgress } from '@mui/material';
-import { getAppointments, getLeadPainters } from '../../apis';
-import { handleNullStrings } from '../../helpers';
-import { ManageBooking } from '../../components/Dashboard/ManageBooking';
-import SuccessToast from '../../components/common/SuccessToast';
-import FailedToast from '../../components/common/FailedToast';
+import { Backdrop, CircularProgress } from '@mui/material';
+import { getBookings } from '../../../apis';
+import { handleNullStrings } from '../../../helpers';
 
 const headCells = [
     {
@@ -48,15 +44,16 @@ const headCells = [
         label: 'Booking Location',
     },
     {
-        id: 'venueType',
-        disablePadding: false,
-        label: 'Venue Type',
-    },
-    {
-        id: 'bookingPhone',
+        id: 'completeAddress',
         numeric: true,
         disablePadding: false,
-        label: 'Booking Phone',
+        label: 'Complete Address',
+    },
+    {
+        id: 'venueType',
+        numeric: true,
+        disablePadding: false,
+        label: 'Venue Type',
     },
     {
         id: 'venueDetails',
@@ -65,17 +62,23 @@ const headCells = [
         label: 'Venue Details',
     },
     {
-        id: 'estimatedLiters',
+        id: 'startDate',
         numeric: true,
         disablePadding: false,
-        label: 'Estimated Liters',
+        label: 'Start Date',
     },
     {
-        id: 'estimated',
+        id: 'endDate',
         numeric: true,
         disablePadding: false,
-        label: 'Estimated Time',
+        label: 'End Date',
     },
+    {
+        id: 'projectProgress',
+        numeric: true,
+        disablePadding: false,
+        label: 'Project Progress',
+    }
 ];
 
 function EnhancedTableHead(props) {
@@ -149,7 +152,7 @@ function EnhancedTableToolbar(props) {
         >
             {numSelected > 0 ? (
                 <Typography
-                    sx={{ flex: '1 1 100%' }}
+                    sx={{ flex: '1 1 100%', fontFamily: 'Clearface' }}
                     color="inherit"
                     variant="subtitle1"
                     component="div"
@@ -164,7 +167,7 @@ function EnhancedTableToolbar(props) {
                     component="div"
                     fontWeight={"bold"}
                 >
-                    Appointments
+                    All
                 </Typography>
             )}
 
@@ -189,7 +192,7 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export const Dashboard = () => {
+export const All = ({ leadPainterId }) => {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState();
     const [selected, setSelected] = React.useState([]);
@@ -198,29 +201,20 @@ export const Dashboard = () => {
     const [loading, setLoading] = React.useState(false);
     const [change, setChange] = React.useState(false);
     const [data, setData] = React.useState([]);
-    const [booking, setBooking] = React.useState();
-    const [leadPainters, setLeadPainters] = React.useState([]);
     const [openSuccess, setOpenSucess] = React.useState(false);
     const [openFailed, setOpenFailed] = React.useState(false);
     const [text, setText] = React.useState("");
 
     React.useEffect(() => {
         async function fetchData() {
-            setLoading(true);
-            setData(await getAppointments());
-            setLeadPainters(await getLeadPainters())
-            setLoading(false);
+            setData(await getBookings(leadPainterId));
         }
         fetchData();
-    }, [change])
+    }, [])
 
     const handleDelete = async () => {
         setChange(!change);
         setSelected([])
-    }
-
-    const toggleBackdrop = () => {
-        setOpen(!open);
     }
 
     const handleRequestSort = (event, property) => {
@@ -231,19 +225,19 @@ export const Dashboard = () => {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelected = data?.map((n) => n.id);
+            const newSelected = data?.map((n) => n.username);
             setSelected(newSelected);
             return;
         }
         setSelected([]);
     };
 
-    const handleClick = (event, id) => {
-        const selectedIndex = selected.indexOf(id);
+    const handleClick = (event, name) => {
+        const selectedIndex = selected.indexOf(name);
         let newSelected = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id);
+            newSelected = newSelected.concat(selected, name);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -272,13 +266,8 @@ export const Dashboard = () => {
         setOpenFailed(false);
     }
 
-    const handleBackDrop = (event, booking) => {
-        setOpen(!open);
-        setBooking(booking);
-    }
-
     return (
-        <Box sx={{ width: '90%', marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             {/* <Button sx={{ alignSelf: "flex-end" }} color="primary" startIcon={<AddIcon />} onClick={() => { setOpen(true) }}>
                 Appointments
             </Button> */}
@@ -301,7 +290,7 @@ export const Dashboard = () => {
                         />
                         <TableBody>
                             {data?.map((row, index) => {
-                                const isItemSelected = isSelected(row.id);
+                                const isItemSelected = isSelected(row.username);
                                 const labelId = `enhanced-table-checkbox-${index}`;
 
                                 return (
@@ -310,14 +299,13 @@ export const Dashboard = () => {
                                         role="checkbox"
                                         aria-checked={isItemSelected}
                                         tabIndex={-1}
-                                        key={row?.id}
+                                        key={row.id}
                                         selected={isItemSelected}
                                         sx={{ cursor: 'pointer' }}
-                                        onClick={(event) => { handleBackDrop(event, row) }}
                                     >
                                         <TableCell padding="checkbox">
                                             <Checkbox
-                                                onClick={(event) => { event.stopPropagation(); handleClick(event, row.id); }}
+                                                onClick={(event) => { event.stopPropagation(); handleClick(event, row.username); }}
                                                 color="primary"
                                                 checked={isItemSelected}
                                                 inputProps={{
@@ -332,7 +320,7 @@ export const Dashboard = () => {
                                             padding="none"
                                             align='center'
                                         >
-                                            {row?.id}
+                                            {row.id}
                                         </TableCell>
                                         <TableCell
                                             component="th"
@@ -347,10 +335,19 @@ export const Dashboard = () => {
                                             component="th"
                                             id={labelId}
                                             scope="row"
-                                            align='center'
                                             padding="none"
+                                            align='center'
                                         >
                                             {handleNullStrings(row?.Venue?.location)}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align='center'
+                                        >
+                                            {handleNullStrings(row?.Venue?.address)}
                                         </TableCell>
                                         <TableCell
                                             component="th"
@@ -366,8 +363,9 @@ export const Dashboard = () => {
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
-                                            {handleNullStrings(row?.bookingPhone)}
+                                            {handleNullStrings(row?.Venue.toString())}
                                         </TableCell>
                                         <TableCell
                                             component="th"
@@ -376,7 +374,7 @@ export const Dashboard = () => {
                                             padding="none"
                                             align='center'
                                         >
-                                            {JSON.stringify(row?.Venue).slice(0, 10)}
+                                            {handleNullStrings(row?.startDate)}
                                         </TableCell>
                                         <TableCell
                                             component="th"
@@ -385,7 +383,7 @@ export const Dashboard = () => {
                                             padding="none"
                                             align='center'
                                         >
-                                            {handleNullStrings(row?.estimatedLiters)}
+                                            {handleNullStrings(row?.endDate)}
                                         </TableCell>
                                         <TableCell
                                             component="th"
@@ -394,7 +392,7 @@ export const Dashboard = () => {
                                             padding="none"
                                             align='center'
                                         >
-                                            {handleNullStrings(row?.estimatedDays)}
+                                            {handleNullStrings(row?.progress)}
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -411,16 +409,17 @@ export const Dashboard = () => {
 
             {
                 loading ? <CircularProgress color="inherit" sx={{ mt: 2 }} /> :
-                    data?.length === 0 ? <Typography variant='h5' sx={{ textAlign: "center", marginTop: 10, color: "text.secondary", marginBottom: 50 }}>No Appointments available!</Typography> : <></>
+                    data?.length === 0 ? <Typography variant='h5' sx={{ textAlign: "center", marginTop: 10, color: "text.secondary", marginBottom: 50 }}>No Bookings available!</Typography> : <></>
             }
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                 open={open}
+            // onClick={toggleBackdrop}
             >
-                <ManageBooking setOpen={setOpen} change={change} setChange={setChange} setOpenSuccess={setOpenSucess} setOpenFailed={setOpenFailed} setText={setText} data={booking} setData={setBooking} closeBackdrop={toggleBackdrop} leadPainters={leadPainters} />
+                {/* <AddAdmin setOpen={setOpen} change={change} setChange={setChange} openSuccess={setOpenSucess} openFailed={setOpenFailed} setText={setText} /> */}
             </Backdrop>
-            <SuccessToast open={openSuccess} handleClose={handleClose} text={text} />
-            <FailedToast open={openFailed} handleClose={handleClose} text={text} />
+            {/* <SuccessToast open={openSuccess} handleClose={handleClose} text={text} />
+            <FailedToast open={openFailed} handleClose={handleClose} text={text} /> */}
         </Box>
     );
 }

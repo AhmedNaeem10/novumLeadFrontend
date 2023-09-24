@@ -20,42 +20,65 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import AddIcon from '@mui/icons-material/Add';
-import { Backdrop, Button, CircularProgress } from '@mui/material';
-import { getAppointments } from '../../apis';
-import { handleNullStrings } from '../../helpers';
+import { Backdrop, CircularProgress } from '@mui/material';
+import { getBookings } from '../../../apis';
+import { handleNullStrings } from '../../../helpers';
 
 const headCells = [
     {
         id: 'bookingId',
+        numeric: false,
         disablePadding: true,
         label: 'Booking ID',
     },
     {
         id: 'bookingName',
+        numeric: true,
         disablePadding: false,
         label: 'Booking Name',
     },
     {
         id: 'bookingLocation',
+        numeric: true,
         disablePadding: false,
         label: 'Booking Location',
     },
     {
+        id: 'completeAddress',
+        numeric: true,
+        disablePadding: false,
+        label: 'Complete Address',
+    },
+    {
         id: 'venueType',
+        numeric: true,
         disablePadding: false,
         label: 'Venue Type',
     },
     {
-        id: 'estimatedLiters',
+        id: 'venueDetails',
+        numeric: true,
         disablePadding: false,
-        label: 'Estimated Liters',
+        label: 'Venue Details',
     },
     {
-        id: 'bill',
+        id: 'startDate',
+        numeric: true,
         disablePadding: false,
-        label: 'Bill (PKR)',
+        label: 'Start Date',
     },
+    {
+        id: 'endDate',
+        numeric: true,
+        disablePadding: false,
+        label: 'End Date',
+    },
+    {
+        id: 'projectProgress',
+        numeric: true,
+        disablePadding: false,
+        label: 'Project Progress',
+    }
 ];
 
 function EnhancedTableHead(props) {
@@ -144,7 +167,7 @@ function EnhancedTableToolbar(props) {
                     component="div"
                     fontWeight={"bold"}
                 >
-                    Accounts
+                    All
                 </Typography>
             )}
 
@@ -169,22 +192,22 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export const Accounts = () => {
+export const Confirmed = ({ leadPainterId }) => {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState();
     const [selected, setSelected] = React.useState([]);
     const [dense, setDense] = React.useState(false);
     const [open, setOpen] = React.useState(false);
-    const [data, setData] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [change, setChange] = React.useState(false);
+    const [data, setData] = React.useState([]);
     const [openSuccess, setOpenSucess] = React.useState(false);
     const [openFailed, setOpenFailed] = React.useState(false);
     const [text, setText] = React.useState("");
 
     React.useEffect(() => {
         async function fetchData() {
-            setData(await getAppointments('confirmed'));
+            setData(await getBookings(leadPainterId, "Confirmed"));
         }
         fetchData();
     }, [])
@@ -244,7 +267,7 @@ export const Accounts = () => {
     }
 
     return (
-        <Box sx={{ width: '90%', marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             {/* <Button sx={{ alignSelf: "flex-end" }} color="primary" startIcon={<AddIcon />} onClick={() => { setOpen(true) }}>
                 Appointments
             </Button> */}
@@ -295,6 +318,7 @@ export const Accounts = () => {
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
                                             {row.id}
                                         </TableCell>
@@ -303,6 +327,7 @@ export const Accounts = () => {
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
                                             {handleNullStrings(row?.bookingName)}
                                         </TableCell>
@@ -311,14 +336,25 @@ export const Accounts = () => {
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
-                                            {handleNullStrings(row?.Venue?.locations)}
+                                            {handleNullStrings(row?.Venue?.location)}
                                         </TableCell>
                                         <TableCell
                                             component="th"
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
+                                        >
+                                            {handleNullStrings(row?.Venue?.address)}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align='center'
                                         >
                                             {handleNullStrings(row?.Venue?.venueType)}
                                         </TableCell>
@@ -327,16 +363,36 @@ export const Accounts = () => {
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
-                                            {handleNullStrings(row?.estimatedLiters)}
+                                            {handleNullStrings(row?.Venue.toString())}
                                         </TableCell>
                                         <TableCell
                                             component="th"
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
-                                            {handleNullStrings(row?.bill)}
+                                            {handleNullStrings(row?.startDate)}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align='center'
+                                        >
+                                            {handleNullStrings(row?.endDate)}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align='center'
+                                        >
+                                            {handleNullStrings(row?.progress)}
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -353,7 +409,7 @@ export const Accounts = () => {
 
             {
                 loading ? <CircularProgress color="inherit" sx={{ mt: 2 }} /> :
-                    data?.length === 0 ? <Typography variant='h5' sx={{ textAlign: "center", marginTop: 10, color: "text.secondary", marginBottom: 50 }}>No Accounts available!</Typography> : <></>
+                    data?.length === 0 ? <Typography variant='h5' sx={{ textAlign: "center", marginTop: 10, color: "text.secondary", marginBottom: 50 }}>No Bookings available!</Typography> : <></>
             }
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}

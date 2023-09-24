@@ -20,33 +20,65 @@ import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import AddIcon from '@mui/icons-material/Add';
-import { Backdrop, Button, CircularProgress } from '@mui/material';
-import { getUsers } from '../../apis';
-import { useSelector } from 'react-redux';
-import { handleNullStrings } from '../../helpers';
+import { Backdrop, CircularProgress } from '@mui/material';
+import { getBookings } from '../../../apis';
+import { handleNullStrings } from '../../../helpers';
 
 const headCells = [
     {
-        id: 'name',
+        id: 'bookingId',
+        numeric: false,
         disablePadding: true,
-        label: 'Name',
+        label: 'Booking ID',
     },
     {
-        id: 'email',
+        id: 'bookingName',
+        numeric: true,
         disablePadding: false,
-        label: 'Email',
+        label: 'Booking Name',
     },
     {
-        id: 'phone',
+        id: 'bookingLocation',
+        numeric: true,
         disablePadding: false,
-        label: 'Phone',
+        label: 'Booking Location',
     },
     {
-        id: 'location',
+        id: 'completeAddress',
+        numeric: true,
         disablePadding: false,
-        label: 'Location',
+        label: 'Complete Address',
     },
+    {
+        id: 'venueType',
+        numeric: true,
+        disablePadding: false,
+        label: 'Venue Type',
+    },
+    {
+        id: 'venueDetails',
+        numeric: true,
+        disablePadding: false,
+        label: 'Venue Details',
+    },
+    {
+        id: 'startDate',
+        numeric: true,
+        disablePadding: false,
+        label: 'Start Date',
+    },
+    {
+        id: 'endDate',
+        numeric: true,
+        disablePadding: false,
+        label: 'End Date',
+    },
+    {
+        id: 'projectProgress',
+        numeric: true,
+        disablePadding: false,
+        label: 'Project Progress',
+    }
 ];
 
 function EnhancedTableHead(props) {
@@ -135,7 +167,7 @@ function EnhancedTableToolbar(props) {
                     component="div"
                     fontWeight={"bold"}
                 >
-                    Users
+                    All
                 </Typography>
             )}
 
@@ -160,23 +192,22 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export const Users = () => {
+export const Pending = ({ leadPainterId }) => {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState();
     const [selected, setSelected] = React.useState([]);
     const [dense, setDense] = React.useState(false);
     const [open, setOpen] = React.useState(false);
-    const [data, setData] = React.useState([]);
     const [loading, setLoading] = React.useState(false);
     const [change, setChange] = React.useState(false);
+    const [data, setData] = React.useState([]);
     const [openSuccess, setOpenSucess] = React.useState(false);
     const [openFailed, setOpenFailed] = React.useState(false);
     const [text, setText] = React.useState("");
-    const { token } = useSelector(store => store);
 
     React.useEffect(() => {
         async function fetchData() {
-            setData(await getUsers(token));
+            setData(await getBookings(leadPainterId, "Pending"));
         }
         fetchData();
     }, [])
@@ -236,7 +267,7 @@ export const Users = () => {
     }
 
     return (
-        <Box sx={{ width: '90%', marginTop: 8, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             {/* <Button sx={{ alignSelf: "flex-end" }} color="primary" startIcon={<AddIcon />} onClick={() => { setOpen(true) }}>
                 Appointments
             </Button> */}
@@ -282,38 +313,86 @@ export const Users = () => {
                                                 }}
                                             />
                                         </TableCell>
-
                                         <TableCell
                                             component="th"
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
-                                            {handleNullStrings(`${row.firstName} ${row.lastName}`)}
+                                            {row.id}
                                         </TableCell>
                                         <TableCell
                                             component="th"
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
-                                            {handleNullStrings(row.email)}
+                                            {handleNullStrings(row?.bookingName)}
                                         </TableCell>
                                         <TableCell
                                             component="th"
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
-                                            {handleNullStrings(row.phone)}
+                                            {handleNullStrings(row?.Venue?.location)}
                                         </TableCell>
                                         <TableCell
                                             component="th"
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            align='center'
                                         >
-                                            {handleNullStrings(row.location)}
+                                            {handleNullStrings(row?.Venue?.address)}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align='center'
+                                        >
+                                            {handleNullStrings(row?.Venue?.venueType)}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align='center'
+                                        >
+                                            {handleNullStrings(row?.Venue.toString())}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align='center'
+                                        >
+                                            {handleNullStrings(row?.startDate)}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align='center'
+                                        >
+                                            {handleNullStrings(row?.endDate)}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align='center'
+                                        >
+                                            {handleNullStrings(row?.progress)}
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -330,7 +409,7 @@ export const Users = () => {
 
             {
                 loading ? <CircularProgress color="inherit" sx={{ mt: 2 }} /> :
-                    data?.length === 0 ? <Typography variant='h5' sx={{ textAlign: "center", marginTop: 10, color: "text.secondary", marginBottom: 50 }}>No Users available!</Typography> : <></>
+                    data?.length === 0 ? <Typography variant='h5' sx={{ textAlign: "center", marginTop: 10, color: "text.secondary", marginBottom: 50 }}>No Bookings available!</Typography> : <></>
             }
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
