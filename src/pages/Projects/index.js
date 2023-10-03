@@ -24,6 +24,10 @@ import { Backdrop, CircularProgress } from '@mui/material';
 import { getProjects } from '../../apis';
 import { handleNullStrings } from '../../helpers';
 import { useSelector } from 'react-redux';
+import { ManageProjectCard } from '../../components/Projects/ManageProjectCard';
+import SuccessToast from '../../components/common/SuccessToast';
+import FailedToast from '../../components/common/FailedToast';
+import Chip from '@mui/material/Chip';
 
 const headCells = [
     {
@@ -77,7 +81,7 @@ function EnhancedTableHead(props) {
                     <TableCell
                         key={headCell.id}
                         sortDirection={orderBy === headCell.id ? order : false}
-                        align={headCell.numeric ? 'right' : 'left'}
+                    // align={headCell.numeric ? 'right' : 'left'}
                     >
                         <TableSortLabel
                             active={orderBy === headCell.id}
@@ -123,7 +127,7 @@ function EnhancedTableToolbar(props) {
         >
             {numSelected > 0 ? (
                 <Typography
-                    sx={{ flex: '1 1 100%', fontFamily: 'Clearface' }}
+                    sx={{ flex: '1 1 100%' }}
                     color="inherit"
                     variant="subtitle1"
                     component="div"
@@ -170,6 +174,7 @@ export const Projects = () => {
     const [dense, setDense] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [data, setData] = React.useState([]);
+    const [project, setProject] = React.useState();
     const [loading, setLoading] = React.useState(false);
     const [change, setChange] = React.useState(false);
     const [openSuccess, setOpenSucess] = React.useState(false);
@@ -183,7 +188,7 @@ export const Projects = () => {
             setData(await getProjects(id));
         }
         fetchData();
-    }, [])
+    }, [change])
 
     const handleDelete = async () => {
         setChange(!change);
@@ -205,12 +210,12 @@ export const Projects = () => {
         setSelected([]);
     };
 
-    const handleClick = (event, name) => {
-        const selectedIndex = selected.indexOf(name);
+    const handleClick = (event, id) => {
+        const selectedIndex = selected.indexOf(id);
         let newSelected = [];
 
         if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, name);
+            newSelected = newSelected.concat(selected, id);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
         } else if (selectedIndex === selected.length - 1) {
@@ -231,12 +236,21 @@ export const Projects = () => {
 
     const isSelected = (name) => selected.indexOf(name) !== -1;
 
+    const toggleBackdrop = () => {
+        setOpen(!open);
+    }
+
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
         setOpenSucess(false);
         setOpenFailed(false);
+    }
+
+    const handleBackDrop = (event, booking) => {
+        setOpen(!open);
+        setProject(booking);
     }
 
     return (
@@ -264,7 +278,7 @@ export const Projects = () => {
                         />
                         <TableBody>
                             {data?.map((row, index) => {
-                                const isItemSelected = isSelected(row.username);
+                                const isItemSelected = isSelected(row.id);
                                 const labelId = `enhanced-table-checkbox-${index}`;
 
                                 return (
@@ -276,10 +290,11 @@ export const Projects = () => {
                                         key={row.id}
                                         selected={isItemSelected}
                                         sx={{ cursor: 'pointer' }}
+                                        onClick={(event) => { handleBackDrop(event, row) }}
                                     >
                                         <TableCell padding="checkbox">
                                             <Checkbox
-                                                onClick={(event) => { event.stopPropagation(); handleClick(event, row.username); }}
+                                                onClick={(event) => { event.stopPropagation(); handleClick(event, row.id); }}
                                                 color="primary"
                                                 checked={isItemSelected}
                                                 inputProps={{
@@ -292,6 +307,7 @@ export const Projects = () => {
                                             id={labelId}
                                             scope="row"
                                             padding="none"
+                                            sx={{ flex: 1 }}
                                         >
                                             {row.id}
                                         </TableCell>
@@ -299,8 +315,9 @@ export const Projects = () => {
                                             component="th"
                                             id={labelId}
                                             scope="row"
+                                            sx={{ flex: 1 }}
                                             padding="none"
-                                            align='center'
+                                        // align='center'
                                         >
                                             {handleNullStrings(row?.bookingName)}
                                         </TableCell>
@@ -309,7 +326,8 @@ export const Projects = () => {
                                             id={labelId}
                                             scope="row"
                                             padding="none"
-                                            align='center'
+                                            sx={{ flex: 1 }}
+                                        // align='center'
                                         >
                                             {handleNullStrings(row?.Venue?.venueType)}
                                         </TableCell>
@@ -318,9 +336,16 @@ export const Projects = () => {
                                             id={labelId}
                                             scope="row"
                                             padding="none"
-                                            align='center'
+                                            sx={{ flexWrap: "wrap", width: '30%' }}
+                                        // align='center'
                                         >
-                                            {handleNullStrings(row?.progress)}
+                                            {
+                                                row?.BookingStages?.map((stage, index) => {
+                                                    return (
+                                                        <Chip label={stage.stage} variant={stage.status ? "filled" : "outlined"} sx={{ m: 1 }} />
+                                                    );
+                                                })
+                                            }
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -344,10 +369,10 @@ export const Projects = () => {
                 open={open}
             // onClick={toggleBackdrop}
             >
-                {/* <AddAdmin setOpen={setOpen} change={change} setChange={setChange} openSuccess={setOpenSucess} openFailed={setOpenFailed} setText={setText} /> */}
+                <ManageProjectCard data={project} closeBackdrop={toggleBackdrop} setOpen={setOpen} change={change} setChange={setChange} setOpenSucess={setOpenSucess} setOpenFailed={setOpenFailed} setText={setText} />
             </Backdrop>
-            {/* <SuccessToast open={openSuccess} handleClose={handleClose} text={text} />
-            <FailedToast open={openFailed} handleClose={handleClose} text={text} /> */}
+            <SuccessToast open={openSuccess} handleClose={handleClose} text={text} />
+            <FailedToast open={openFailed} handleClose={handleClose} text={text} />
         </Box >
     );
 }

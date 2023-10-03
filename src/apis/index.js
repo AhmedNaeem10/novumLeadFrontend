@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { API_CONSTANT } from '../constants/ApiConstants';
 
-// const base_url = "http://localhost:4000/"
-const base_url = "http://52.66.203.161:4000/"
+const base_url = "http://localhost:4000/"
+// const base_url = "http://52.66.203.161:4000/"
 
 export const login = async (username, password) => {
     const response = await axios.post(base_url + API_CONSTANT.LOGIN, { username, password })
@@ -37,3 +37,7 @@ export const getProjects = async (id) => {
     return response.data.data;
 }
 
+export const updateProjectStages = async (id, stages) => {
+    const response = await axios.put(`${base_url}${API_CONSTANT.UPDATE_PROJECT_STAGES}${id}`, { stages });
+    return response.data;
+}
