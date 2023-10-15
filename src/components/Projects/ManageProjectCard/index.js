@@ -13,6 +13,8 @@ export const ManageProjectCard = ({ data, closeBackdrop, loading, setOpenSucess,
     const [dates, setDates] = useState([])
 
     const handleSubmit = async () => {
+        console.log(dates, stages);
+        // return;
         const response = await updateProjectStages(data?.id, stages, dates)
         if (response?.status == "success") {
             setText("Stages successfully updated!");
@@ -26,13 +28,13 @@ export const ManageProjectCard = ({ data, closeBackdrop, loading, setOpenSucess,
     }
 
     const handleStageUpdate = (stage, index) => {
-        let datesCopy = [...dates]
-        datesCopy[index] = undefined;
-        setDates([...datesCopy])
         if (stages.includes(stage)) {
             let copyStages = [...stages]
             copyStages.splice(copyStages.indexOf(stage), 1);
             setStages(copyStages);
+            let datesCopy = [...dates]
+            datesCopy[index] = null;
+            setDates([...datesCopy])
         } else {
             let copyStages = [...stages]
             copyStages.push(stage);
