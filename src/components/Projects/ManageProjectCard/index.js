@@ -1,17 +1,19 @@
-import React from 'react';
-import { Card, CardHeader, CircularProgress, IconButton, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Card, CardHeader, CircularProgress, IconButton, TextField, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Switch from '@mui/material/Switch';
 import { updateProjectStages } from '../../../apis';
+import { formatDate } from '../../../helpers';
 
 export const ManageProjectCard = ({ data, closeBackdrop, loading, setOpenSucess, setOpenFailed, setChange, change, setText }) => {
     const [stages, setStages] = React.useState([]);
+    const [dates, setDates] = useState([])
 
     const handleSubmit = async () => {
-        const response = await updateProjectStages(data?.id, stages)
+        const response = await updateProjectStages(data?.id, stages, dates)
         if (response?.status == "success") {
             setText("Stages successfully updated!");
             setOpenSucess(true);
@@ -23,7 +25,10 @@ export const ManageProjectCard = ({ data, closeBackdrop, loading, setOpenSucess,
         setChange(!change)
     }
 
-    const handleStageUpdate = (stage) => {
+    const handleStageUpdate = (stage, index) => {
+        let datesCopy = [...dates]
+        datesCopy[index] = undefined;
+        setDates([...datesCopy])
         if (stages.includes(stage)) {
             let copyStages = [...stages]
             copyStages.splice(copyStages.indexOf(stage), 1);
@@ -35,15 +40,24 @@ export const ManageProjectCard = ({ data, closeBackdrop, loading, setOpenSucess,
         }
     }
 
+    const handleDateUpdate = (date, index) => {
+        let datesCopy = [...dates]
+        datesCopy[index] = date;
+        setDates([...datesCopy])
+    }
+
     React.useEffect(() => {
         if (data) {
             let names = []
+            let dates_ = []
             for (let stage of data.BookingStages) {
                 if (stage.status) {
                     names.push(stage.stage)
                 }
+                dates_.push(stage.date)
             }
             setStages(names);
+            setDates(dates_);
         }
     }, [data])
 
@@ -78,7 +92,22 @@ export const ManageProjectCard = ({ data, closeBackdrop, loading, setOpenSucess,
                             return (
                                 <Box key={index} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', mt: 2 }}>
                                     <Typography sx={{ fontSize: 18 }}>{stage?.stage}</Typography>
-                                    <Switch checked={stages.includes(stage.stage)} onClick={() => { handleStageUpdate(stage.stage) }} />
+                                    <Switch checked={stages.includes(stage.stage)} onClick={() => { handleStageUpdate(stage.stage, index) }} />
+                                    <TextField type="date" variant="outlined" sx={{
+                                        m: 1,
+                                        "& label.Mui-focused": {
+                                            color: "gray"
+                                        },
+                                        "& .MuiOutlinedInput-root": {
+                                            "&.Mui-focused fieldset": {
+                                                borderColor: "gray"
+                                            }
+                                        }
+                                    }} focused={true}
+                                        disabled={!stages.includes(stage.stage)}
+                                        value={dates[index]}
+                                        onChange={(e) => handleDateUpdate(e.target.value, index)}
+                                    />
                                 </Box>
                             );
                         })

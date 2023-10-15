@@ -37,7 +37,7 @@ export const getProjects = async (id) => {
     return response.data.data;
 }
 
-export const updateProjectStages = async (id, stages) => {
-    const response = await axios.put(`${base_url}${API_CONSTANT.UPDATE_PROJECT_STAGES}${id}`, { stages });
+export const updateProjectStages = async (id, stages, dates) => {
+    const response = await axios.put(`${base_url}${API_CONSTANT.UPDATE_PROJECT_STAGES}${id}`, { stages, dates });
     return response.data;
 }
